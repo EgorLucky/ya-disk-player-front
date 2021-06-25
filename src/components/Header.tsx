@@ -170,7 +170,7 @@ export default function Header() {
   }
 
   return (
-    <header>
+    <header style={{height: "64px"}}>
       <AppBar className={header}>
         {mobileView ? displayMobile() : displayDesktop()}
       </AppBar>
