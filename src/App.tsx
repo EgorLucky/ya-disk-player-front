@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, useParams } from "react-router-dom";
 import Header from './components/Header';
+import GetToken from './components/GetToken';
+import Logout from './components/Logout';
 
 async function getUserInfo() {
   const accessToken = localStorage.getItem("accessToken");
@@ -27,6 +30,8 @@ async function getUserInfo() {
   return json;
 }
 
+const useParamss = () => useParams<any>(); 
+
 
 class App extends Component<any, any> {
   constructor(props: any){
@@ -37,17 +42,31 @@ class App extends Component<any, any> {
     const userInfo = await getUserInfo();
     this.setState({userInfo: userInfo});
   }
-  
+
+  getToken = async () =>{
+    console.log(this);
+  };
+
   render() {
     return (
       <div className="App">
+        <Router>
         <Header/>
-        {
-          this.state?.userInfo != null 
-          && this.state?.userInfo.isAuthorized != true 
-          && <a href="https://oauth.yandex.ru/authorize?client_id=3b45d777976d49aea146b1d79bcd13d1&response_type=code&redirect_uri=http://localhost:3000/getToken">ввввойти через яндекс так сказать....</a>
-        }
-        {this.state?.userInfo.isAuthorized && this.state?.userInfo.email}
+          <Route path="/getToken">
+            <GetToken/>  
+          </Route>
+          <Route path="/logout">
+            <Logout/>  
+          </Route>
+          <Route path="*">
+          {
+            this.state?.userInfo != null 
+            && this.state?.userInfo.isAuthorized != true 
+            && <a href="https://oauth.yandex.ru/authorize?client_id=3b45d777976d49aea146b1d79bcd13d1&response_type=code&redirect_uri=http://localhost:3000/getToken">ввввойти через яндекс так сказать....</a>
+          }
+          {this.state?.userInfo.isAuthorized && this.state?.userInfo.email}
+          </Route>
+        </Router>
       </div>
     );
   }
