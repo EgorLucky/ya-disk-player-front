@@ -54,17 +54,21 @@ class App extends Component<any, any> {
           <Route path="/logout">
             <Logout/>  
           </Route>
-          <Route path="/files">
+          <Route path="/user">
             {
               this.state?.userInfo != null 
               && this.state?.userInfo.isAuthorized != true 
               && <a href="https://oauth.yandex.ru/authorize?client_id=3b45d777976d49aea146b1d79bcd13d1&response_type=code&redirect_uri=http://localhost:3000/getToken">ввввойти через яндекс так сказать....</a>
             }
+            <div style={{float: "right"}}>
             {
               this.state?.userInfo.isAuthorized 
               && this.state?.userInfo.email
             }
-            {userInfo != null && <FileExplorer userInfo={userInfo}/>}
+            </div>
+          </Route>
+          <Route path="/user/files">
+              {userInfo != null && <FileExplorer userInfo={userInfo}/>}
           </Route>
         </Router>
       </div>
