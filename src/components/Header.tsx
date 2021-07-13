@@ -42,16 +42,16 @@ const useStyles = makeStyles(() => ({
 
 const headersData = [
   {
-    label: "Listings",
-    href: "/listings",
+    label: "Files",
+    href: "user/files",
   },
   {
-    label: "Mentors",
-    href: "/mentors",
+    label: "Synchronization",
+    href: "user/synchronization",
   },
   {
     label: "My Account",
-    href: "/account",
+    href: "user/account",
   },
   {
     label: "Log Out",
