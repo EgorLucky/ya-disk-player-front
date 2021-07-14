@@ -68,7 +68,7 @@ class App extends Component<any, any> {
             </div>
           </Route>
           <Route path="/user/files">
-              {userInfo != null && <FileExplorer userInfo={userInfo}/>}
+              {userInfo != null && <FileExplorer userInfo={userInfo} setAudioUrl={(s:any) => alert(s)}/>}
           </Route>
         </Router>
       </div>

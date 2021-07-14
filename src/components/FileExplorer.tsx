@@ -57,7 +57,31 @@ class FileExplorer extends Component<any, any> {
   }
 
   getFileURL = async (path: string) => {
+    if(path == null)
+      path = "";
+      
+    const accessToken = localStorage.getItem("accessToken");
 
+    path = encodeURI(path);
+    const response = await fetch("https://localhost:5001/file/getUrl?path=" + path, {
+      headers:{
+        "Authorization": "Bearer " + accessToken
+      }
+    });
+    if(response.status == 401){
+      alert("Unauthorized");
+      return;
+    }
+
+    if(response.status != 200)
+    {
+      alert("Error code " + response.status);
+      return;
+    }
+
+    const json = await response.json();
+
+    this.props.setAudioUrl(json.href);
   }
 
   backClicked = async () => {
