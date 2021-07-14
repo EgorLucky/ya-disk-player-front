@@ -10,8 +10,16 @@ class FileExplorer extends Component<any, any> {
   }
 
   fileClicked = async (e :any) => {
-    if(e.type == 'folder')
+    if(e.type == 'folder'){
+      const folderStack = this.state?.folderStack == null? 
+                    []
+                    : this.state?.folderStack;
+      folderStack.push(e.path);
+      if(this.state?.folderStack == null)
+          folderStack.last = () =>  folderStack[folderStack.length - 1];
+      this.setState({folderStack: folderStack});
       await this.getFolderContent(e.path);
+    }
     else
       await this.getFileURL(e.path);
   }
@@ -20,8 +28,6 @@ class FileExplorer extends Component<any, any> {
 
     if(path == null)
       path = "";
-
-    this.setState({parentFolderPath: path});
 
     const accessToken = localStorage.getItem("accessToken");
 
@@ -55,7 +61,11 @@ class FileExplorer extends Component<any, any> {
   }
 
   backClicked = async () => {
-    await this.getFolderContent(this.state?.parentFolderPath)
+    const folderStack = this.state?.folderStack;
+    folderStack.pop();
+    this.setState({folderStack: folderStack});
+
+    await this.getFolderContent(folderStack.last())
   }
 
   render() {
@@ -64,8 +74,8 @@ class FileExplorer extends Component<any, any> {
         <button 
           disabled=
           { 
-            this.state?.parentFolderPath == null ||
-              this.state?.parentFolderPath == ""
+            this.state?.folderStack == null ||
+              this.state?.folderStack.length == 0
           } 
           onClick={this.backClicked}>
             Backkkk
