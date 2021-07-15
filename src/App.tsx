@@ -6,6 +6,7 @@ import Header from './components/Header';
 import GetToken from './components/GetToken';
 import Logout from './components/Logout';
 import FileExplorer from './components/FileExplorer'; 
+import AudioPlayer from './components/AudioPlayer';
 
 async function getUserInfo() {
   const accessToken = localStorage.getItem("accessToken");
@@ -42,6 +43,10 @@ class App extends Component<any, any> {
     this.setState({userInfo: userInfo});
   }
 
+  setAudioUrl = (url: string) => {
+    this.setState({currentAudioUrl:url})
+  }
+
   render() {
     const userInfo = this.state?.userInfo;
     return (
@@ -68,7 +73,10 @@ class App extends Component<any, any> {
             </div>
           </Route>
           <Route path="/user/files">
-              {userInfo != null && <FileExplorer userInfo={userInfo} setAudioUrl={(s:any) => alert(s)}/>}
+              {userInfo != null && <FileExplorer userInfo={userInfo} setAudioUrl={this.setAudioUrl}/>}
+          </Route>
+          <Route path="/user">
+            <AudioPlayer url={this.state?.currentAudioUrl}/>
           </Route>
         </Router>
       </div>

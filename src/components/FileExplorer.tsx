@@ -62,7 +62,7 @@ class FileExplorer extends Component<any, any> {
       
     const accessToken = localStorage.getItem("accessToken");
 
-    path = encodeURI(path);
+    path = encodeURIComponent(path);
     const response = await fetch("https://localhost:5001/file/getUrl?path=" + path, {
       headers:{
         "Authorization": "Bearer " + accessToken
