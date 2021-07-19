@@ -6,28 +6,37 @@ class FileExplorer extends Component<any, any> {
   }
 
   async componentDidMount(){
-    await this.getFolderContent("");
+    await this.getFolderContent({path:"disk:", forward: true});
   }
 
-  fileClicked = async (e :any) => {
+  fileClicked = async (e: any) => {
     if(e.type == 'folder'){
-      const folderStack = this.state?.folderStack == null? 
-                    []
-                    : this.state?.folderStack;
-      folderStack.push(e.path);
-      if(this.state?.folderStack == null)
-          folderStack.last = () =>  folderStack[folderStack.length - 1];
-      this.setState({folderStack: folderStack});
-      await this.getFolderContent(e.path);
+      await this.getFolderContent({path: e.path, forward: true});
     }
     else
       await this.getFileURL(e.path);
   }
 
-  getFolderContent = async (path: string) => {
+  getFolderContent = async ({path, forward}: any) => {
 
     if(path == null)
       path = "";
+
+    const folderStack = this.state?.folderStack == null? 
+                  []
+                  : this.state?.folderStack;
+
+    if(forward == true) {
+      folderStack.push(path);
+      if(this.state?.folderStack == null)
+          folderStack.last = () =>  folderStack[folderStack.length - 1];
+    }
+    else {
+      folderStack.pop();
+      path = folderStack.last();
+    }
+
+    this.setState({folderStack: folderStack});
 
     const accessToken = localStorage.getItem("accessToken");
 
@@ -86,10 +95,7 @@ class FileExplorer extends Component<any, any> {
 
   backClicked = async () => {
     const folderStack = this.state?.folderStack;
-    folderStack.pop();
-    this.setState({folderStack: folderStack});
-
-    await this.getFolderContent(folderStack.last())
+    await this.getFolderContent({forward: false})
   }
 
   render() {
