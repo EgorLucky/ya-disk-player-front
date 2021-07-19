@@ -100,7 +100,7 @@ class FileExplorer extends Component<any, any> {
 
   render() {
     return (
-      <div style={{float:"left", textAlign:"left", width:"90%"}}>
+      <div style={{float:"left", textAlign:"left", width:"90%", marginLeft:"10px", marginBottom:"60px"}}>
         <button 
           disabled=
           { 
@@ -109,7 +109,14 @@ class FileExplorer extends Component<any, any> {
           } 
           onClick={this.backClicked}>
             Backkkk
-          </button>
+        </button>
+
+        <span style={{marginLeft:"10px"}}>
+          {
+            this.state?.folderStack != null &&
+            this.state?.folderStack.last()
+          }
+        </span>
         
         {
           this.state != null 
