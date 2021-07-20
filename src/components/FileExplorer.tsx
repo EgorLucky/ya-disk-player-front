@@ -6,18 +6,18 @@ class FileExplorer extends Component<any, any> {
   }
 
   async componentDidMount(){
-    await this.getFolderContent({path:"disk:", forward: true});
+    await this.getFolderContent({path:"disk:", forward: true, page: 1});
   }
 
   fileClicked = async (e: any) => {
     if(e.type == 'folder'){
-      await this.getFolderContent({path: e.path, forward: true});
+      await this.getFolderContent({path: e.path, forward: true, page: 1});
     }
     else
       await this.getFileURL(e.path);
   }
 
-  getFolderContent = async ({path, forward}: any) => {
+  getFolderContent = async ({path, forward, page}: any) => {
 
     if(path == null)
       path = "";
@@ -26,25 +26,30 @@ class FileExplorer extends Component<any, any> {
                   []
                   : this.state?.folderStack;
 
-    if(forward == true) {
-      folderStack.push(path);
-      if(this.state?.folderStack == null)
-          folderStack.last = () =>  folderStack[folderStack.length - 1];
-    }
-    else {
-      folderStack.pop();
-      path = folderStack.last();
+    if(page == 1 || forward == false) {
+      if(forward == true) {
+        folderStack.push(path);
+        if(this.state?.folderStack == null)
+            folderStack.last = () =>  folderStack[folderStack.length - 1];
+      }
+      else {
+        folderStack.pop();
+        path = folderStack.last();
+      }
     }
 
+    this.setState({page: page});
+    
     this.setState({folderStack: folderStack});
 
     const accessToken = localStorage.getItem("accessToken");
 
-    const response = await fetch("https://localhost:5001/file/get?parentFolderPath=" + path + "&search=&page=1",{
+    const response = await fetch("https://localhost:5001/file/get?parentFolderPath=" + encodeURIComponent(path) + `&search=&page=${page}`,{
       headers:{
         "Authorization": "Bearer " + accessToken
       }
     });
+
     if(response.status == 401){
       alert("Unauthorized");
       return;
@@ -62,7 +67,12 @@ class FileExplorer extends Component<any, any> {
                     j.onClick = () => this.fileClicked(j);
                     return j;
                   });
-    this.setState({files: json});
+    if(page != 1) {
+      const files = this.state.files;
+      json.map((j: any) => files.push(j));
+      this.setState({files: files});
+    }
+    else this.setState({files: json});
   }
 
   getFileURL = async (path: string) => {
@@ -95,12 +105,27 @@ class FileExplorer extends Component<any, any> {
 
   backClicked = async () => {
     const folderStack = this.state?.folderStack;
-    await this.getFolderContent({forward: false})
+    await this.getFolderContent({forward: false, page: 1})
+  }
+
+  onScroll = async(e: any) => {
+    const {scrollTop, scrollHeight, offsetHeight} = e.target;
+
+    if(scrollTop + offsetHeight != scrollHeight) {
+      return;
+    }
+
+    const page = this.state?.page ?? 1;
+    this.getFolderContent({
+          path: this.state.folderStack.last(), 
+          page: page + 1,
+          forward: true
+    });
   }
 
   render() {
     return (
-      <div style={{float:"left", textAlign:"left", width:"90%", marginLeft:"10px", marginBottom:"60px"}}>
+      <div style={{float:"left", textAlign:"left", width:"95%", marginLeft:"10px", marginBottom:"60px", maxHeight: "790px", overflowY: "auto", overflowX: "hidden"}} onScroll={this.onScroll}>
         <button 
           disabled=
           { 
