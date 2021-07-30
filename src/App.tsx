@@ -7,6 +7,9 @@ import GetToken from './components/GetToken';
 import Logout from './components/Logout';
 import FileExplorer from './components/FileExplorer'; 
 import AudioPlayer from './components/AudioPlayer';
+import { yandexDiskPlayerService } from './YaDPlayerService';
+
+yandexDiskPlayerService.setConfiguration();
 
 async function getUserInfo() {
   const accessToken = localStorage.getItem("accessToken");
@@ -15,21 +18,8 @@ async function getUserInfo() {
     return {
       isAuthorized: false
     };
-  
-  const response = await fetch("https://localhost:5001/User/getUserInfo", {
-    headers:{
-      "Authorization": "Bearer " + accessToken
-    }
-  })
 
-  if(response.status == 401)
-    return {
-      isAuthorized: false
-    };
-
-  const json = await response.json();
-  json.isAuthorized = true;
-  return json;
+  return await yandexDiskPlayerService.getUserInfo(accessToken);
 }
 
 
@@ -47,26 +37,9 @@ class App extends Component<any, any> {
     if(audio.path == null)
     audio.path = "";
       
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken") as string;
 
-    const encodedPath = encodeURIComponent(audio.path);
-    const response = await fetch("https://localhost:5001/file/getUrl?path=" + encodedPath, {
-      headers:{
-        "Authorization": "Bearer " + accessToken
-      }
-    });
-    if(response.status == 401){
-      alert("Unauthorized");
-      return;
-    }
-
-    if(response.status != 200)
-    {
-      alert("Error code " + response.status);
-      return;
-    }
-
-    const json = await response.json();
+    const json = await yandexDiskPlayerService.getUrl(accessToken, audio.path);
 
     this.setState({
       currentAudioUrl: json.href,
@@ -105,26 +78,9 @@ class App extends Component<any, any> {
   }
 
   getFolderContent = async (path: string, page: number, fileClicked: Function) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("accessToken") as string;
 
-    const response = await fetch(`https://localhost:5001/file/get?parentFolderPath=${encodeURIComponent(path)}&search=&page=${page}`,{
-      headers:{
-        "Authorization": "Bearer " + accessToken
-      }
-    });
-
-    if(response.status == 401){
-      alert("Unauthorized");
-      return;
-    }
-
-    if(response.status != 200)
-    {
-      alert("Error code " + response.status);
-      return;
-    }
-
-    const json = (await response.json())
+    const json = (await yandexDiskPlayerService.getFiles(accessToken, path, page))
                   .map((j: any) => 
                   {
                     j.onClick = () => fileClicked(j);
@@ -160,7 +116,7 @@ class App extends Component<any, any> {
         <Router>
         <Header/>
           <Route path="/getToken">
-            <GetToken/>  
+            <GetToken onGetToken={yandexDiskPlayerService.getToken}/>  
           </Route>
           <Route path="/logout">
             <Logout/>  
@@ -187,7 +143,6 @@ class App extends Component<any, any> {
                   onGetFolderContent={this.getFolderContent} 
                   folders={this.state?.folders}
                   currentPath={this.state?.currentPath}
-                  
                 />
               }
           </Route>

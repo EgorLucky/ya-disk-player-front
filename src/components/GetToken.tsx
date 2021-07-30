@@ -5,20 +5,13 @@ class GetToken extends Component<any, any> {
     super(props);
   }
 
-  getToken = async (code: string) => {
-    const response = await fetch("https://localhost:5001/Auth/getToken?code=" + code);
-    const json = await response.json();
-
-    return json;
-  }
-
   async componentDidMount(){
 
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if(code == null)
         return;
-    const token = await this.getToken(code);
+    const token = await this.props.onGetToken(code);
 
     if(token.success == true) {
         localStorage.setItem("accessToken", token.accessToken);
