@@ -9,40 +9,8 @@ class FileExplorer extends Component<any, any> {
     await this.getFolderContent({path:"disk:", forward: true, page: 1});
   }
 
-  fileClicked = async (e: any) => {
-    if(e.type == 'folder'){
-      await this.getFolderContent({path: e.path, forward: true, page: 1});
-    }
-    else
-      await this.props.setPlayingAudio(e);
-  }
-
   getFolderContent = async ({path, forward, page}: any) => {
-
-    if(path == null)
-      path = "";
-
-    const folderStack = this.state?.folderStack == null? 
-                  []
-                  : this.state?.folderStack;
-
-    if(page == 1 || forward == false) {
-      if(forward == true) {
-        folderStack.push(path);
-        if(this.state?.folderStack == null)
-            folderStack.last = () =>  folderStack[folderStack.length - 1];
-      }
-      else {
-        folderStack.pop();
-        path = folderStack.last();
-      }
-    }
-
-    this.setState({page: page});
-    
-    this.setState({folderStack: folderStack});
-
-    await this.props?.onGetFolderContent(path, page, this.fileClicked);
+    await this.props?.onGetFolderContent(path, forward, page);
   }
 
 
@@ -57,9 +25,9 @@ class FileExplorer extends Component<any, any> {
       return;
     }
 
-    const page = this.state?.page ?? 1;
+    const page = this.props?.page ?? 1;
     this.getFolderContent({
-          path: this.state.folderStack.last(), 
+          path: this.props.folderStack.last(), 
           page: page + 1,
           forward: true
     });
@@ -73,8 +41,8 @@ class FileExplorer extends Component<any, any> {
         <button 
           disabled=
           { 
-            this.state?.folderStack == null ||
-              this.state?.folderStack.length == 0
+            this.props?.folderStack == null ||
+              this.props?.folderStack.length == 0
           } 
           onClick={this.backClicked}>
             Backkkk
@@ -82,18 +50,19 @@ class FileExplorer extends Component<any, any> {
 
         <span style={{marginLeft:"10px"}}>
           {
-            this.state?.folderStack != null &&
-            this.state?.folderStack.last()
+            this.props?.folderStack != null &&
+            this.props?.folderStack.last()
           }
         </span>
         
         {
           this.props?.folders != null
           && this.props?.folders.filter((f: any) => f.name == this?.props?.currentPath)[0]?.files?.map((f: any) => {
+            const color = "#FFFFFF";
             return (
               <div 
                 onClick={f.onClick} 
-                style={{height:"40px", paddingTop: "15px", width:"100%", borderStyle: "solid", borderColor: "black", borderWidth: "1px"}}>
+                style={{height:"40px", paddingTop: "15px", width:"100%", borderStyle: "solid", borderColor: "black", borderWidth: "1px", backgroundColor: color}}>
                 {f.name}
               </div>
             );

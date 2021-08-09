@@ -48,17 +48,25 @@ class App extends Component<any, any> {
     })
   }
 
-  setNextUrl = async (audio: any, random: boolean) =>
+  fileClicked = async (e: any) => {
+    if(e.type == 'folder'){
+      await this.getFolderContent(e.path, true, 1);
+    }
+    else
+      await this.setPlayingAudio(e);
+  }
+
+  setNextUrl = async (audio: any, random: boolean, fileClicked: Function) =>
   {
     if(random) {
 
     }
     else {
-      const playingFolder = this.state
+      let playingFolder = this.state
                                 .folders
                                 .filter((f: any) => f.name == this.state.playingFolder)[0];
 
-      const files = playingFolder
+      let files = playingFolder
                       .files
                       .filter((f: any) => f.type == "file")
                       .map((f: any) => f.path);
@@ -66,7 +74,20 @@ class App extends Component<any, any> {
       if(currentIndex < 0)
         return;
 
-      const nextIndex = (currentIndex + 1) % files.length;
+      const nextIndex = currentIndex + 1;
+
+      if(nextIndex >= files.length){
+        await this.getFolderContent(this.state.playingFolder as string, true, playingFolder.page + 1);
+        playingFolder = this.state
+                                .folders
+                                .filter((f: any) => f.name == this.state.playingFolder)[0];
+
+        files = playingFolder
+                        .files
+                        .filter((f: any) => f.type == "file")
+                        .map((f: any) => f.path);
+      }
+
       const nextPath = files[nextIndex];
       const nextAudio = playingFolder
                           .files
@@ -77,13 +98,37 @@ class App extends Component<any, any> {
     }
   }
 
-  getFolderContent = async (path: string, page: number, fileClicked: Function) => {
+  getFolderContent = async (path: string, forward: boolean, page: number) => {
+    if(path == null)
+      path = "";
+
+    const folderStack = this.state?.folderStack == null? 
+                  []
+                  : this.state?.folderStack;
+
+    if(page == 1 || forward == false) {
+      if(forward == true) {
+        folderStack.push(path);
+        if(this.state?.folderStack == null)
+            folderStack.last = () =>  folderStack[folderStack.length - 1];
+      }
+      else {
+        folderStack.pop();
+        path = folderStack.last();
+      }
+    }
+
+    this.setState({
+      explorerPage: page,
+      folderStack: folderStack
+    });
+
     const accessToken = localStorage.getItem("accessToken") as string;
 
     const json = (await yandexDiskPlayerService.getFiles(accessToken, path, page))
                   .map((j: any) => 
                   {
-                    j.onClick = () => fileClicked(j);
+                    j.onClick = () => this.fileClicked(j);
                     return j;
                   });
     if(page != 1) {
@@ -91,6 +136,8 @@ class App extends Component<any, any> {
                         ?.folders
                         .filter((f: any) => f.name == path)
                         [0];
+      folder.page = page;
+      
       const files = folder.files;
       json.map((j: any) => files.push(j));
       this.setState({
@@ -104,7 +151,7 @@ class App extends Component<any, any> {
     }
     else {
       this.setState({
-        folders: [{name: path, files: json}],
+        folders: [{name: path, files: json, page: page}],
         currentPath: path});
     }
   }
@@ -143,6 +190,8 @@ class App extends Component<any, any> {
                   onGetFolderContent={this.getFolderContent} 
                   folders={this.state?.folders}
                   currentPath={this.state?.currentPath}
+                  folderStack={this.state?.folderStack}
+                  page={this.state.explorerPage}
                 />
               }
           </Route>
