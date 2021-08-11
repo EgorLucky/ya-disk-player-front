@@ -208,6 +208,7 @@ class App extends Component<any, any> {
                   currentPath={this.state?.currentPath}
                   folderStack={this.state?.folderStack}
                   page={this.state.explorerPage}
+                  currentAudio={this.state.currentAudio}
                 />
               }
           </Route>

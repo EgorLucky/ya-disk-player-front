@@ -58,7 +58,8 @@ class FileExplorer extends Component<any, any> {
         {
           this.props?.folders != null
           && this.props?.folders.filter((f: any) => f.name == this?.props?.currentPath)[0]?.files?.map((f: any) => {
-            const color = "#FFFFFF";
+            const isPlayingAudio = this.props?.currentAudio?.resourceId == f.resourceId && f.type == "file";
+            const color = isPlayingAudio? "#A19C9C" : "#FFFFFF";
             return (
               <div 
                 onClick={f.onClick} 
