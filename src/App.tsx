@@ -44,7 +44,7 @@ class App extends Component<any, any> {
     this.setState({
       currentAudioUrl: json.href,
       currentAudio: audio, 
-      playingFolder: this.state.currentPath
+      playingFolder: audio.parentFolderPath
     })
   }
 
@@ -74,7 +74,7 @@ class App extends Component<any, any> {
       if(currentIndex < 0)
         return;
 
-      const nextIndex = currentIndex + 1;
+      let nextIndex = currentIndex + 1;
 
       if(nextIndex >= files.length){
         await this.getFolderContent(this.state.playingFolder as string, true, playingFolder.page + 1);
@@ -86,6 +86,9 @@ class App extends Component<any, any> {
                         .files
                         .filter((f: any) => f.type == "file")
                         .map((f: any) => f.path);
+
+        if(files.length >= nextIndex)
+          nextIndex = 0;
       }
 
       const nextPath = files[nextIndex];
@@ -123,36 +126,49 @@ class App extends Component<any, any> {
       folderStack: folderStack
     });
 
-    const accessToken = localStorage.getItem("accessToken") as string;
-
-    const json = (await yandexDiskPlayerService.getFiles(accessToken, path, page))
-                  .map((j: any) => 
-                  {
-                    j.onClick = () => this.fileClicked(j);
-                    return j;
-                  });
-    if(page != 1) {
-      const folder = this.state
-                        ?.folders
-                        .filter((f: any) => f.name == path)
-                        [0];
-      folder.page = page;
-      
-      const files = folder.files;
-      json.map((j: any) => files.push(j));
+    if(path == this.state?.playingFolder && page == 1){
       this.setState({
-        folders: this.state?.folders,
-        currentPath: path
+        currentPath: path,
+        explorerPage: this.state
+                        .folders
+                        .filter((f: any) => f.name == this.state.playingFolder)[0]
+                        .page,
       });
-
-      // const files = this.state.files;
-      // json.map((j: any) => files.push(j));
-      // this.setState({files: files});
     }
     else {
-      this.setState({
-        folders: [{name: path, files: json, page: page}],
-        currentPath: path});
+      const accessToken = localStorage.getItem("accessToken") as string;
+
+      const json = (await yandexDiskPlayerService.getFiles(accessToken, path, page))
+                    .map((j: any) => 
+                    {
+                      j.onClick = () => this.fileClicked(j);
+                      return j;
+                    });
+      if(page != 1) {
+        const folder = this.state
+                          ?.folders
+                          .filter((f: any) => f.name == path)
+                          [0];
+        folder.page = page;
+        
+        const files = folder.files;
+        json.map((j: any) => files.push(j));
+        this.setState({
+          folders: this.state?.folders,
+          currentPath: path
+        });
+      }
+      else {
+        const folders = this.state?.folders ?? [];
+
+        if(folders.filter((f: any) => f.name == path).length == 0)
+          folders.push({name: path, files: json, page: page});
+
+        this.setState({
+          folders: folders,
+          currentPath: path
+        });
+      }
     }
   }
 
