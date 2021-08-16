@@ -2,7 +2,7 @@ export const yandexDiskPlayerService = {
 	setConfiguration(configuration = null, environment = "dev"){
 		this.serviceHost = (environment === "production")? 
 							//configuration.mathParserServiceUrlProd
-                            "yadplayer.herokuapp.com": 
+                            "https://yadplayer.herokuapp.com": 
 							"https://localhost:5001";
                             //configuration.mathParserServiceUrlLocal;
 	},

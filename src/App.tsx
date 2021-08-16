@@ -9,7 +9,7 @@ import FileExplorer from './components/FileExplorer';
 import AudioPlayer from './components/AudioPlayer';
 import { yandexDiskPlayerService } from './YaDPlayerService';
 
-yandexDiskPlayerService.setConfiguration();
+yandexDiskPlayerService.setConfiguration(null, "production");
 
 async function getUserInfo() {
   const accessToken = localStorage.getItem("accessToken");
