@@ -136,8 +136,13 @@ class App extends Component<any, any> {
       });
     }
     else {
-      const accessToken = localStorage.getItem("accessToken") as string;
+      const accessToken = localStorage.getItem("accessToken");
 
+      if(accessToken == null)
+      {
+        alert("Unauthorized");
+        return;
+      }
       const json = (await yandexDiskPlayerService.getFiles(accessToken, path, page))
                     .map((j: any) => 
                     {
@@ -172,6 +177,8 @@ class App extends Component<any, any> {
     }
   }
 
+  onGetToken = (code: string) => yandexDiskPlayerService.getToken(code);
+
   render() {
     const userInfo = this.state?.userInfo;
     return (
@@ -179,7 +186,7 @@ class App extends Component<any, any> {
         <Router>
         <Header/>
           <Route path="/getToken">
-            <GetToken onGetToken={yandexDiskPlayerService.getToken}/>  
+            <GetToken onGetToken={this.onGetToken}/>  
           </Route>
           <Route path="/logout">
             <Logout/>  
