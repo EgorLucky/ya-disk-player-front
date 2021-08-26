@@ -11,16 +11,17 @@ class AudioPlayer extends Component<any, any> {
     return (
       <div style={{position: "fixed", width: "100%", bottom: "0%", backgroundColor: "grey"}}>
         <div>{audio?.name}</div>
-        <div  style={{display:"inline-flex", width:"50%"}}>
-          <button style={{display:"block"}}>ннннназад</button>
+        <div  style={{display:"inline-flex", width:"90%"}}>
+          <button style={{display:"block"}}>⏮️</button>
           <audio 
-            autoPlay 
+            autoPlay
             controls 
             src={url} 
-            style={{display:"block", width:"100%"}} 
+            style={{display:"block", width:"100%", height: "40px"}} 
             onEnded={onEnded}
+            crossOrigin="anonymous"
             />
-          <button style={{display:"block"}} onClick={onEnded}>вперррред</button>
+          <button style={{display:"block"}} onClick={onEnded}>⏭️</button>
           <button style={{display:"block"}}>🔀</button>
         </div>
       </div>
