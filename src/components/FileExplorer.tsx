@@ -20,8 +20,9 @@ class FileExplorer extends Component<any, any> {
 
   onScroll = async(e: any) => {
     const {scrollTop, scrollHeight, offsetHeight} = e.target;
-
-    if(scrollTop + offsetHeight != scrollHeight) {
+    //alert("scroll!!");
+    if(scrollTop + offsetHeight >= scrollHeight - 10) {
+      //alert(`not scroll bottom !! ${scrollTop}, ${offsetHeight}, ${scrollHeight}, ${scrollTop + offsetHeight}`);
       return;
     }
 
