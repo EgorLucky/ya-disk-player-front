@@ -41,10 +41,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 const headersData = [
-  {
-    label: "Files",
-    href: "user/files",
-  },
+  // {
+  //   label: "Files",
+  //   href: "user/files",
+  // },
   {
     label: "Synchronization",
     href: "user/synchronization",

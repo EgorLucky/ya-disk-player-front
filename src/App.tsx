@@ -5,8 +5,10 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Header from './components/Header';
 import GetToken from './components/GetToken';
 import Logout from './components/Logout';
-import FileExplorer from './components/FileExplorer'; 
-import AudioPlayer from './components/AudioPlayer';
+//import FileExplorer from './components/FileExplorer'; 
+//import AudioPlayer from './components/AudioPlayer';
+import { Synchronization } from './components/Synchronization';
+import { IgnoreFiles } from './components/IgnoreFiles';
 import { yandexDiskPlayerService } from './YaDPlayerService';
 
 yandexDiskPlayerService.setConfiguration(null, "production");
@@ -204,27 +206,38 @@ class App extends Component<any, any> {
             }
             </div>
           </Route>
-          <Route path="/user/files">
-              {
-                userInfo != null && 
-                <FileExplorer 
-                  userInfo={userInfo} 
-                  setPlayingAudio={this.setPlayingAudio} 
-                  onGetFolderContent={this.getFolderContent} 
-                  folders={this.state?.folders}
-                  currentPath={this.state?.currentPath}
-                  folderStack={this.state?.folderStack}
-                  page={this.state.explorerPage}
-                  currentAudio={this.state.currentAudio}
-                />
-              }
+
+          <Route path="/user/synchronization">
+            <Synchronization userInfo={userInfo}/>
           </Route>
-          <Route path="/user">
-            <AudioPlayer 
-              url={this.state?.currentAudioUrl}
-              audio={this.state?.currentAudio}
-              setNextUrl={this.setNextUrl}/>
+          <Route path="/user/ignoreFiles">
+            <IgnoreFiles userInfo={userInfo}/>
           </Route>
+          {
+            /* <Route path="/user/files">
+                {
+                  userInfo != null && 
+                  <FileExplorer 
+                    userInfo={userInfo} 
+                    setPlayingAudio={this.setPlayingAudio} 
+                    onGetFolderContent={this.getFolderContent} 
+                    folders={this.state?.folders}
+                    currentPath={this.state?.currentPath}
+                    folderStack={this.state?.folderStack}
+                    page={this.state.explorerPage}
+                    currentAudio={this.state.currentAudio}
+                  />
+                }
+            </Route> */
+          }
+          {
+            /* <Route path="/user">
+              <AudioPlayer 
+                url={this.state?.currentAudioUrl}
+                audio={this.state?.currentAudio}
+                setNextUrl={this.setNextUrl}/>
+            </Route> */
+          }
         </Router>
       </div>
     );
